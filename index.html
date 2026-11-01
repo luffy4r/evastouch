@@ -1362,8 +1362,43 @@ initProduct=function(){
 };
 
 /* Quantité */
+/* Fleurs qui jaillissent sur + et − */
+let lastFlower=0;
+function flowerPop(target,dir){
+  if(reduce||!target)return;
+  const now=Date.now();if(now-lastFlower<110)return;lastFlower=now;
+  const r=target.getBoundingClientRect?target.getBoundingClientRect():target;
+  const cx=r.left+r.width/2,cy=r.top+r.height/2,n=dir>0?2:1;
+  for(let i=0;i<n;i++){
+    const s=document.createElement('span');s.textContent=i?'💮':'🌸';
+    s.style.cssText='position:fixed;left:'+cx+'px;top:'+cy+'px;font-size:'+(15+Math.random()*7)+'px;z-index:800;pointer-events:none';
+    document.body.appendChild(s);
+    const dx=(Math.random()-.5)*(dir>0?46:30),dy=dir>0?-(46+Math.random()*30):(38+Math.random()*20),rot=(Math.random()-.5)*160;
+    s.animate([
+      {transform:'translate(-50%,-50%) scale(.4) rotate(0deg)',opacity:0},
+      {transform:'translate(calc(-50% + '+dx*.5+'px),calc(-50% + '+dy*.5+'px)) scale(1.1) rotate('+rot*.5+'deg)',opacity:1,offset:.35},
+      {transform:'translate(calc(-50% + '+dx+'px),calc(-50% + '+dy+'px)) scale(.8) rotate('+rot+'deg)',opacity:0}
+    ],{duration:650+Math.random()*250,delay:i*70,easing:'cubic-bezier(.2,.7,.3,1)',fill:'both'}).onfinish=()=>s.remove();
+  }
+}
 const _q=changeCurrentQty;
-changeCurrentQty=function(){_q.apply(this,arguments);const n=$('#display-current-qty');if(n)retrigger(n,'fx-pop')};
+changeCurrentQty=function(d){
+  const before=state.currentQty;
+  _q.apply(this,arguments);
+  const n=$('#display-current-qty');if(n)retrigger(n,'fx-pop');
+  if(state.currentQty!==before)flowerPop(document.querySelector('button[onclick="changeCurrentQty('+d+')"]'),d);
+};
+const _uq=updateCartItemQty;
+updateCartItemQty=function(variantName,change){
+  const find=()=>state.cart.find(i=>i.variant===variantName);
+  const before=find()?find().qty:0;
+  const sel="updateCartItemQty('"+variantName+"', "+change+")";
+  const btn=[...document.querySelectorAll('#checkout-cart-items button')].find(b=>b.getAttribute('onclick')===sel);
+  const rect=btn?btn.getBoundingClientRect():null;
+  _uq.apply(this,arguments);
+  const it=find();
+  if(rect&&((!it&&before>0)||(it&&it.qty!==before)))flowerPop(rect,change);
+};
 
 /* Ajout au panier : la miniature vole vers le panier */
 function bumpCart(){const b=$('#cart-count'),c=$('#cart-btn');if(b)retrigger(b,'fx-bump');if(c)retrigger(c,'fx-wiggle')}
