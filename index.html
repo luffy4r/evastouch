@@ -15,7 +15,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://ik.imagekit.io" crossorigin>
     <title>Tablier de cuisine anti-taches et imperméable 🌸👩‍🍳 | Eva's Touch 🌸</title>
-    <link rel="icon" href="https://ik.imagekit.io/evastouch/evastouch.PNG"> 
     <meta name="description" content="Tablier de cuisine anti-taches et imperméable, en plusieurs couleurs. Livraison dans les 58 wilayas, paiement à la livraison 🌸">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Eva's Touch">
@@ -1411,10 +1410,24 @@ openModal=function(){
   });
 };
 const _close=closeModal;
+let closing=false;
 closeModal=function(){
-  const bd=$('#modal-backdrop');
-  if(bd){bd.classList.remove('backdrop-in');retrigger(bd,'backdrop-exit');setTimeout(()=>bd.classList.remove('backdrop-exit'),420)}
-  _close.apply(this,arguments);
+  const modal=$('#checkout-modal'),box=$('#modal-box'),bd=$('#modal-backdrop'),cart=$('#cart-btn');
+  if(closing||modal.classList.contains('hidden'))return;
+  if(bd){bd.classList.remove('backdrop-in');retrigger(bd,'backdrop-exit');setTimeout(()=>bd.classList.remove('backdrop-exit'),620)}
+  /* après une commande confirmée ou animations réduites : ancienne fermeture */
+  const ss0=$('#success-state');
+  if(reduce||!cart||(ss0&&!ss0.classList.contains('hidden'))){_close.apply(this,arguments);return}
+  closing=true;
+  const b=box.getBoundingClientRect(),c=cart.getBoundingClientRect();
+  const dx=c.left+c.width/2-(b.left+b.width/2),dy=c.top+c.height/2-(b.top+b.height/2);
+  box.classList.remove('modal-content-enter');
+  const a=box.animate([
+    {transform:'translate(-50%,-50%) scale(1)',opacity:1,borderRadius:'24px'},
+    {transform:'translate(calc(-50% + '+dx*.35+'px),calc(-50% + '+dy*.35+'px)) scale(.55)',opacity:.9,offset:.45},
+    {transform:'translate(calc(-50% + '+dx+'px),calc(-50% + '+dy+'px)) scale(.04)',opacity:0,borderRadius:'60px'}
+  ],{duration:520,easing:'cubic-bezier(.55,.05,.35,1)',fill:'forwards'});
+  a.onfinish=()=>{modal.classList.add('hidden');document.body.style.overflow='auto';a.cancel();closing=false;bumpCart()};
 };
 
 /* Totaux : petit "pop" quand le montant change */
@@ -1506,12 +1519,44 @@ function showUndo(item,idx){
   document.body.appendChild(el);undoEl=el;
   undoTimer=setTimeout(hideUndo,4500);
 }
+function petalsFrom(el){
+  const r=el.getBoundingClientRect(),em=['🌸','🌸','💮','🩷'];
+  for(let i=0;i<16;i++){
+    const s=document.createElement('span');s.textContent=em[i%em.length];
+    s.style.cssText='position:fixed;left:'+(r.left+Math.random()*r.width)+'px;top:'+(r.top+Math.random()*r.height)+'px;font-size:'+(13+Math.random()*13)+'px;z-index:800;pointer-events:none';
+    document.body.appendChild(s);
+    const dx=(Math.random()-.3)*160,dy=-(90+Math.random()*150),rot=(Math.random()-.5)*540,sway=(Math.random()-.5)*60;
+    s.animate([
+      {transform:'translate(-50%,-50%) scale(.6) rotate(0deg)',opacity:0},
+      {transform:'translate(calc(-50% + '+sway+'px),calc(-50% + '+dy*.35+'px)) scale(1) rotate('+rot*.4+'deg)',opacity:1,offset:.2},
+      {transform:'translate(calc(-50% + '+dx+'px),calc(-50% + '+dy+'px)) scale(.7) rotate('+rot+'deg)',opacity:0}
+    ],{duration:900+Math.random()*500,delay:Math.random()*150,easing:'cubic-bezier(.2,.7,.3,1)',fill:'forwards'}).onfinish=()=>s.remove();
+  }
+}
 const _rm=removeFromCart;
-removeFromCart=function(variantName){
+removeFromCart=function(variantName,btn){
   const idx=state.cart.findIndex(i=>i.variant===variantName);
   const item=idx>-1?Object.assign({},state.cart[idx]):null;
-  _rm.apply(this,arguments);
-  if(item)showUndo(item,idx);
+  const row=btn&&btn.closest?btn.closest('.bg-eva-beige'):null;
+  if(!row||!item||reduce){_rm.apply(this,arguments);if(item)showUndo(item,idx);return}
+  if(row.dataset.removing)return;
+  row.dataset.removing='1';
+  btn.classList.add('text-red-600');
+  petalsFrom(row);
+  const cs=getComputedStyle(row),h=row.offsetHeight;
+  row.style.overflow='hidden';
+  const a=row.animate([
+    {height:h+'px',opacity:1,transform:'scale(1)',marginTop:cs.marginTop,marginBottom:cs.marginBottom,paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom,borderTopWidth:cs.borderTopWidth,borderBottomWidth:cs.borderBottomWidth},
+    {height:h+'px',opacity:0,transform:'scale(.92)',marginTop:cs.marginTop,marginBottom:cs.marginBottom,paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom,borderTopWidth:cs.borderTopWidth,borderBottomWidth:cs.borderBottomWidth,offset:.4},
+    {height:'0px',opacity:0,transform:'scale(.92)',marginTop:'0px',marginBottom:'0px',paddingTop:'0px',paddingBottom:'0px',borderTopWidth:'0px',borderBottomWidth:'0px'}
+  ],{duration:720,easing:'cubic-bezier(.4,0,.2,1)',fill:'forwards'});
+  a.onfinish=()=>{
+    state.cart=state.cart.filter(i=>i.variant!==variantName);
+    localStorage.setItem('evastouch_cart',JSON.stringify(state.cart));
+    updateCartBadge();
+    if(!state.cart.length)closeModal();else openModal();
+    showUndo(item,idx);
+  };
 };
 
 /* ===== Utilitaires ===== */
