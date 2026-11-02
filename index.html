@@ -1525,7 +1525,8 @@ function petalBurst(){
 const ss=$('#success-state');
 if(ss)new MutationObserver(()=>{
   const shown=!ss.classList.contains('hidden');const fpb=$('#form-progress');if(fpb)fpb.style.display=shown?'none':'';
-  if(shown&&!ss.dataset.fired){ss.dataset.fired='1';setTimeout(petalBurst,1350)}
+  function toTop(){const bx=$('#modal-box');if(bx)bx.scrollTop=0;const sc=ss.parentElement;if(sc)sc.scrollTop=0}
+  if(shown&&!ss.dataset.fired){ss.dataset.fired='1';toTop();setTimeout(toTop,60);setTimeout(petalBurst,1350)}
   else if(!shown)delete ss.dataset.fired;
 }).observe(ss,{attributes:true,attributeFilter:['class']});
 
@@ -1826,7 +1827,6 @@ function showReceipt(m){
     (navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(()=>{b.textContent='Copié ✓';retrigger(b,'fx-pop');setTimeout(()=>{b.textContent=v},1500)}).catch(()=>{});
   };
   rc.classList.remove('hidden');
-  setTimeout(()=>{if(!rc.classList.contains('hidden'))rc.scrollIntoView({behavior:'smooth',block:'center'})},3000);
 }
 let orderResp=null;
 const _fetch=window.fetch;
@@ -1957,8 +1957,8 @@ if(cform){
    ================================================================== */
 window.EVA_LINKS = {
     instagram:   "https://www.instagram.com/_evastouch_/",   // ta page Instagram
-    tiktok:      "https://www.tiktok.com/@_evastouch_",      // ta page TikTok
-    developpeur: "https://www.instagram.com/luffydz.dev/"    // LuffyDZ
+    tiktok:      "https://www.tiktok.com/",                  // <-- mets ici le lien de ta page TikTok
+    developpeur: "https://www.instagram.com/"                // <-- mets ici le lien de LuffyDZ
 };
 </script>
 
