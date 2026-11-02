@@ -15,7 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://ik.imagekit.io" crossorigin>
     <title>Tablier de cuisine anti-taches et imperméable 🌸👩‍🍳 | Eva's Touch 🌸</title>
-    <link rel="icon" href="https://ik.imagekit.io/evastouch/IMG_7212.PNG"> 
+    <link rel="icon" href="https://ik.imagekit.io/evastouch/IMG_7212.PNG">
     <meta name="description" content="Tablier de cuisine anti-taches et imperméable, en plusieurs couleurs. Livraison dans les 58 wilayas, paiement à la livraison 🌸">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Eva's Touch">
@@ -167,24 +167,28 @@
 
     <header id="site-header" class="bg-white shadow-sm py-0.5 sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 grid grid-cols-3 items-center w-full">
-    <!-- Colonne gauche vide pour équilibrer -->
-    <div></div>
-    
-    <!-- Logo au centre -->
-    <div class="flex justify-center">
-        <img src="https://ik.imagekit.io/evastouch/evastouch.PNG?updatedAt=1793459604320" alt="Eva's Touch" class="h-12 w-auto object-contain">
-    </div>
-    
-    <!-- Bouton panier à droite -->
-    <div class="flex justify-end">
-        <button id="cart-btn" onclick="openModal()" class="relative p-2 text-eva-burgundy hover:bg-eva-pinkLight rounded-full transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
-            <span id="cart-count" class="absolute top-0 right-0 bg-eva-burgundy text-white text-xs rounded-full h-4 w-4 flex items-center justify-center hidden">0</span>
-        </button>
-    </div>
-</div> 
+            <!-- Menu (3 lignes) à gauche -->
+            <div class="flex justify-start">
+                <button id="menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="side-menu" class="relative p-2 text-eva-burgundy hover:bg-eva-pinkLight rounded-full transition">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16" /></svg>
+                </button>
+            </div>
+
+            <!-- Logo au centre -->
+            <div class="flex justify-center">
+                <img src="https://ik.imagekit.io/evastouch/evastouch.PNG?updatedAt=1793459604320" alt="Eva's Touch" class="h-12 w-auto object-contain">
+            </div>
+
+            <!-- Bouton panier à droite -->
+            <div class="flex justify-end">
+                <button id="cart-btn" onclick="openModal()" class="relative p-2 text-eva-burgundy hover:bg-eva-pinkLight rounded-full transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    <span id="cart-count" class="absolute top-0 right-0 bg-eva-burgundy text-white text-xs rounded-full h-4 w-4 flex items-center justify-center hidden">0</span>
+                </button>
+            </div>
+        </div>
     </header>
 
     <main class="flex-grow max-w-2xl mx-auto px-4 py-8 lg:py-12 flex flex-col gap-8"> 
@@ -251,6 +255,10 @@
             </div>
         </div>
     </main>
+
+    <footer class="fx-footer">
+        Le site a été développé par <a data-link="developpeur" href="#" target="_blank" rel="noopener noreferrer">LuffyDZ</a>
+    </footer>
 
     <div id="checkout-modal" class="fixed inset-0 z-50 hidden">
         <div id="modal-backdrop" class="absolute inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
@@ -1917,6 +1925,114 @@ if(cform){
   });
 })();
 }catch(err){console.warn('fx-layer:',err)}
+})();
+</script>
+
+
+<style id="fx-menu-css">
+.fx-menu{position:fixed;inset:0;z-index:60;visibility:hidden;transition:visibility 0s linear .45s}
+.fx-menu.is-open{visibility:visible;transition-delay:0s}
+.fx-menu-bd{position:absolute;inset:0;background:rgba(17,24,39,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);opacity:0;transition:opacity .35s ease}
+.fx-menu.is-open .fx-menu-bd{opacity:1}
+.fx-menu-panel{position:absolute;top:0;bottom:0;left:0;width:min(84vw,320px);display:flex;flex-direction:column;padding:calc(18px + env(safe-area-inset-top,0px)) 20px calc(18px + env(safe-area-inset-bottom,0px));background:#fff;border-radius:0 28px 28px 0;box-shadow:12px 0 40px rgba(0,0,0,.18);transform:translateX(-104%);transition:transform .45s cubic-bezier(.16,1,.3,1)}
+.fx-menu.is-open .fx-menu-panel{transform:none}
+.fx-menu-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.fx-menu-title{font-weight:700;font-size:18px;color:#7a2e44}
+.fx-menu-x{padding:8px;border-radius:9999px;color:#9ca3af;background:#fdf6f2}
+.fx-menu-link{display:flex;align-items:center;gap:14px;padding:12px;margin-bottom:6px;border-radius:16px;font-weight:600;color:#1f2937;transition:background-color .2s,transform .2s}
+.fx-menu-link:active{background:#fbe4ea;transform:scale(.98)}
+.fx-menu-ico{flex:none;width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.fx-ig{background:linear-gradient(45deg,#f9a825,#e1306c 55%,#833ab4)}
+.fx-tt{background:#111}
+.fx-menu-credit{margin-top:auto;padding-top:20px;border-top:2px dashed #fbe4ea;text-align:center;font-size:13px;color:#9ca3af}
+.fx-menu-credit a,.fx-footer a{color:#7a2e44;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.fx-menu.is-open .fx-menu-link,.fx-menu.is-open .fx-menu-credit{animation:fx-up .55s cubic-bezier(.16,1,.3,1) calc(var(--i,0)*80ms + 180ms) both}
+.fx-footer{padding:28px 16px calc(28px + env(safe-area-inset-bottom,0px));text-align:center;font-size:13px;color:#9ca3af}
+</style>
+
+<script>
+/* ==================================================================
+   TES LIENS : remplace seulement ce qui est entre guillemets.
+   (Ils servent pour le menu ET pour le bas de page.)
+   ================================================================== */
+window.EVA_LINKS = {
+    instagram:   "https://www.instagram.com/_evastouch_/",   // ta page Instagram
+    tiktok:      "https://www.tiktok.com/",                  // <-- mets ici le lien de ta page TikTok
+    developpeur: "https://www.instagram.com/"                // <-- mets ici le lien de LuffyDZ
+};
+</script>
+
+<div id="side-menu" class="fx-menu" aria-hidden="true">
+    <div class="fx-menu-bd"></div>
+    <nav class="fx-menu-panel" role="dialog" aria-label="Menu">
+        <div class="fx-menu-top">
+            <span class="fx-menu-title">Menu • القائمة</span>
+            <button type="button" class="fx-menu-x" aria-label="Fermer le menu">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+
+        <a class="fx-menu-link" style="--i:0" data-link="instagram" href="#" target="_blank" rel="noopener noreferrer">
+            <span class="fx-menu-ico fx-ig">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="#fff" stroke="none"/></svg>
+            </span>
+            <span>Notre page Insta</span>
+        </a>
+
+        <a class="fx-menu-link" style="--i:1" data-link="tiktok" href="#" target="_blank" rel="noopener noreferrer">
+            <span class="fx-menu-ico fx-tt">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4v10.2a3.7 3.7 0 1 1-3.7-3.7"/><path d="M14 4c.3 2.4 1.9 3.9 4.2 4.1"/></svg>
+            </span>
+            <span>Notre page TikTok</span>
+        </a>
+
+        <div class="fx-menu-credit" style="--i:2">
+            Le site a été développé par <a data-link="developpeur" href="#" target="_blank" rel="noopener noreferrer">LuffyDZ</a>
+        </div>
+    </nav>
+</div>
+
+<script>
+(function(){
+    var L = window.EVA_LINKS || {};
+    document.querySelectorAll('[data-link]').forEach(function(a){
+        var u = L[a.getAttribute('data-link')];
+        if (u) a.href = u;
+    });
+
+    var menu = document.getElementById('side-menu'),
+        btn = document.getElementById('menu-btn');
+    if (!menu || !btn) return;
+    var panel = menu.querySelector('.fx-menu-panel'),
+        xBtn = menu.querySelector('.fx-menu-x');
+
+    function open(){
+        menu.classList.add('is-open');
+        menu.setAttribute('aria-hidden','false');
+        btn.setAttribute('aria-expanded','true');
+        document.body.style.overflow = 'hidden';
+        setTimeout(function(){ try{ xBtn.focus({preventScroll:true}); }catch(e){} }, 50);
+    }
+    function close(){
+        menu.classList.remove('is-open');
+        menu.setAttribute('aria-hidden','true');
+        btn.setAttribute('aria-expanded','false');
+        document.body.style.overflow = 'auto';
+        try{ btn.focus({preventScroll:true}); }catch(e){}
+    }
+    btn.addEventListener('click', open);
+    xBtn.addEventListener('click', close);
+    menu.querySelector('.fx-menu-bd').addEventListener('click', close);
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && menu.classList.contains('is-open')) close(); });
+
+    /* glisser vers la gauche pour fermer */
+    var x0 = null;
+    panel.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+    panel.addEventListener('touchend', function(e){
+        if (x0 === null) return;
+        var dx = e.changedTouches[0].clientX - x0; x0 = null;
+        if (dx < -60) close();
+    }, {passive:true});
 })();
 </script>
 
