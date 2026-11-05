@@ -1332,6 +1332,28 @@ button[onclick^="changeCurrentQty"].fx-hold{background:#fbe4ea;color:#7a2e44}
 .fx-miss-keep{border-color:#f472b6!important;background-color:#fff1f6!important}
 #submit-order-btn:disabled{pointer-events:none}
 
+/* --- Coches de validation --- */
+@keyframes fx-ck-in{from{opacity:0;transform:translateY(-50%) scale(0)}to{opacity:1;transform:translateY(-50%) scale(1)}}
+.fx-fld{position:relative}
+.fx-ck{position:absolute;top:50%;width:22px;height:22px;pointer-events:none;opacity:0;transform:translateY(-50%) scale(0)}
+.fx-ck svg{display:block;width:100%;height:100%}
+.fx-ck.is-ok{animation:fx-ck-in .45s cubic-bezier(.34,1.56,.64,1) forwards}
+.fx-ck-p{stroke-dasharray:20;stroke-dashoffset:20}
+.fx-ck.is-ok .fx-ck-p{animation:fx-draw .35s ease-out .15s forwards}
+#firstName,#lastName,#phone,#address{padding-right:44px}
+
+/* --- Icônes de livraison --- */
+@keyframes fx-drive{0%{transform:translateX(-28px);opacity:0}55%{transform:translateX(5px);opacity:1}100%{transform:none}}
+@keyframes fx-hop{0%{transform:translateY(0)}25%{transform:translateY(-10px)}50%{transform:translateY(0)}68%{transform:translateY(-4px)}100%{transform:translateY(0)}}
+.fx-dico{flex:none;width:26px;height:26px;margin-right:12px;color:#9ca3af;transition:color .3s}
+.fx-dico svg{display:block;width:100%;height:100%}
+#label-home.border-eva-burgundy .fx-dico,#label-desk.border-eva-burgundy .fx-dico{color:#7a2e44}
+#label-home.border-eva-burgundy .fx-dico svg{animation:fx-drive .8s cubic-bezier(.16,1,.3,1)}
+#label-desk.border-eva-burgundy .fx-dico svg{animation:fx-hop .8s cubic-bezier(.34,1.2,.64,1)}
+
+/* --- Logo cliquable --- */
+#site-header img{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .petals{display:none}
@@ -1545,7 +1567,7 @@ function updateProgress(){
   $('#fp-label').textContent=done===6?'Prêt à confirmer • جاهز للتأكيد 🌸':'Votre progression • تقدمك';
   fp.classList.toggle('is-done',done===6);
   if(lastDone!==-1&&done!==lastDone)retrigger($('#fp-text'),'fx-pop');
-  lastDone=done;
+  lastDone=done;updateChecks();
 }
 const _cfv=checkFormValidity;
 checkFormValidity=function(){_cfv.apply(this,arguments);updateProgress()};
@@ -1924,6 +1946,91 @@ if(cform){
     ph.dispatchEvent(new Event('input',{bubbles:true}));
   });
 })();
+
+/* ===== Coches vertes sur les champs valides ===== */
+const checkRules=[
+  ['firstName',e=>e.value.trim()!==''],
+  ['lastName',e=>e.value.trim()!==''],
+  ['phone',e=>/^(05|06|07)\d{8}$/.test(e.value.trim())],
+  ['wilaya',e=>e.value!==''],
+  ['commune',e=>e.value!==''],
+  ['address',e=>e.value.trim().length>=4],
+  ['desk',e=>e.selectedIndex>0]
+];
+const CHK='<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#22c55e"/><path class="fx-ck-p" d="M7 12.5l3.2 3.2L17 9" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function setupChecks(){
+  checkRules.forEach(r=>{
+    const id=r[0],el=document.getElementById(id);if(!el)return;
+    let host=el.parentElement;
+    if(id==='firstName'||id==='lastName'||id==='phone'){
+      const w=document.createElement('div');w.className='fx-fld';
+      host.insertBefore(w,el);w.appendChild(el);host=w;
+    }else if(getComputedStyle(host).position==='static'){host.style.position='relative'}
+    const ck=document.createElement('span');ck.className='fx-ck';
+    const right=(el.tagName==='SELECT'?44:16)+((id==='address'||id==='desk')?8:0);
+    ck.style.right=right+'px';
+    ck.innerHTML=CHK;host.appendChild(ck);el._ck=ck;
+  });
+  updateChecks();
+}
+function updateChecks(){
+  checkRules.forEach(r=>{
+    const el=document.getElementById(r[0]);
+    if(el&&el._ck)el._ck.classList.toggle('is-ok',!!r[1](el));
+  });
+}
+setupChecks();
+
+/* ===== Icônes de livraison animées ===== */
+(function(){
+  const truck='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="14" height="10" rx="1.5"/><path d="M15 9h4l3 3.5V16h-7z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>';
+  const pin='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>';
+  [['#label-home',truck],['#label-desk',pin]].forEach(x=>{
+    const lab=$(x[0]);if(!lab)return;
+    const ic=document.createElement('span');ic.className='fx-dico';ic.setAttribute('aria-hidden','true');ic.innerHTML=x[1];
+    const radio=lab.querySelector('input[type="radio"]');
+    if(radio&&radio.nextSibling)lab.insertBefore(ic,radio.nextSibling);else lab.appendChild(ic);
+  });
+})();
+
+/* ===== Logo : fleur + remonter en haut, 3 taps = pluie de pétales ===== */
+function bloom(el){
+  if(reduce)return;
+  const r=el.getBoundingClientRect(),s=document.createElement('span');s.textContent='🌸';
+  s.style.cssText='position:fixed;left:'+(r.left+r.width/2)+'px;top:'+(r.top+r.height/2)+'px;font-size:28px;z-index:800;pointer-events:none';
+  document.body.appendChild(s);
+  s.animate([
+    {transform:'translate(-50%,-50%) scale(.2) rotate(-40deg)',opacity:0},
+    {transform:'translate(-50%,-50%) scale(1.3) rotate(0deg)',opacity:1,offset:.45},
+    {transform:'translate(-50%,-60%) scale(1.7) rotate(40deg)',opacity:0}
+  ],{duration:800,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>s.remove();
+}
+function petalRain(){
+  if(reduce)return;
+  const em=['🌸','🌸','💮','🌷','🩷','✨'],W=innerWidth,H=innerHeight;
+  for(let i=0;i<42;i++){
+    const s=document.createElement('span');s.textContent=em[i%em.length];
+    s.style.cssText='position:fixed;left:'+(Math.random()*W)+'px;top:-40px;font-size:'+(14+Math.random()*16)+'px;z-index:800;pointer-events:none';
+    document.body.appendChild(s);
+    const sway=(Math.random()-.5)*120,rot=(Math.random()-.5)*720;
+    s.animate([
+      {transform:'translate(0,0) rotate(0deg)',opacity:0},
+      {transform:'translate('+sway*.3+'px,'+H*.1+'px) rotate('+rot*.2+'deg)',opacity:1,offset:.08},
+      {transform:'translate('+sway+'px,'+(H+60)+'px) rotate('+rot+'deg)',opacity:.9}
+    ],{duration:2600+Math.random()*2200,delay:Math.random()*1400,easing:'cubic-bezier(.3,.1,.7,.9)',fill:'both'}).onfinish=()=>s.remove();
+  }
+}
+const logoImg=$('#site-header img');
+if(logoImg){
+  let taps=[];
+  logoImg.addEventListener('click',()=>{
+    const now=Date.now();
+    taps=taps.filter(t=>now-t<1200);taps.push(now);
+    scrollTo({top:0,behavior:reduce?'auto':'smooth'});
+    bloom(logoImg);
+    if(taps.length>=3){taps=[];petalRain()}
+  });
+}
 }catch(err){console.warn('fx-layer:',err)}
 })();
 </script>
@@ -1957,8 +2064,8 @@ if(cform){
    ================================================================== */
 window.EVA_LINKS = {
     instagram:   "https://www.instagram.com/_evastouch_/",   // ta page Instagram
-    tiktok:      "https://www.tiktok.com/",                  // <-- mets ici le lien de ta page TikTok
-    developpeur: "https://www.instagram.com/"                // <-- mets ici le lien de LuffyDZ
+    tiktok:      "https://www.tiktok.com/@_evastouch_",      // ta page TikTok
+    developpeur: "https://www.instagram.com/luffydz.dev"     // lien de LuffyDZ
 };
 </script>
 
