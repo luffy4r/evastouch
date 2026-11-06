@@ -2143,5 +2143,67 @@ window.EVA_LINKS = {
 })();
 </script>
 
+<style id="fx-roll-css">
+.fx-roll-ov{position:absolute;right:0;pointer-events:none;white-space:nowrap;font-variant-numeric:tabular-nums}
+.fx-roll-hide{color:transparent!important}
+</style>
+
+<script id="fx-roll-js">
+(function(){
+try{
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const totalEl=document.getElementById('summary-total');
+  if(!totalEl||typeof updateOrderSummary!=='function'||reduce)return;
+
+  const num=t=>{const m=String(t).replace(/\s/g,'').match(/-?\d+/);return m?parseInt(m[0],10):null};
+  let shown=num(totalEl.textContent)||0;   /* montant affiché à l'écran en ce moment */
+  let target=shown;                        /* montant vers lequel on roule */
+  let raf=0,ov=null;
+
+  function stop(){
+    cancelAnimationFrame(raf);raf=0;
+    if(ov){ov.remove();ov=null}
+    totalEl.classList.remove('fx-roll-hide');
+  }
+
+  function roll(from,to){
+    stop();
+    const host=totalEl.parentElement;
+    if(getComputedStyle(host).position==='static')host.style.position='relative';
+    /* le vrai total garde toujours la bonne valeur (la commande et le reçu la lisent) ;
+       on affiche seulement un faux chiffre par-dessus pendant l'animation */
+    ov=document.createElement('span');
+    ov.className='fx-roll-ov '+totalEl.className.split(' ').filter(c=>c&&c!=='fx-pop'&&c!=='fx-roll-hide').join(' ');
+    ov.setAttribute('aria-hidden','true');
+    ov.style.top=totalEl.offsetTop+'px';
+    ov.textContent=from+' DZD';
+    host.appendChild(ov);
+    totalEl.classList.add('fx-roll-hide');
+
+    const dur=Math.min(1100,500+Math.abs(to-from)*0.35),t0=performance.now();
+    (function step(t){
+      const p=Math.min((t-t0)/dur,1),e=1-Math.pow(1-p,3);
+      shown=Math.round(from+(to-from)*e);
+      if(ov)ov.textContent=shown+' DZD';
+      if(p<1){raf=requestAnimationFrame(step)}
+      else{
+        shown=to;stop();
+        totalEl.classList.remove('fx-pop');void totalEl.offsetWidth;totalEl.classList.add('fx-pop');
+      }
+    })(t0);
+  }
+
+  const _u=updateOrderSummary;
+  updateOrderSummary=function(){
+    _u.apply(this,arguments);
+    const to=num(totalEl.textContent);
+    if(to===null||to===target)return;
+    target=to;
+    roll(shown,to);
+  };
+}catch(err){console.warn('fx-roll:',err)}
+})();
+</script>
+
 </body>
 </html> 
