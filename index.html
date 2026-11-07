@@ -2223,7 +2223,16 @@ try{
   };
 }catch(err){console.warn('fx-roll:',err)}
 })();
-</script>
+  setInterval(function() {
+    var rc = document.getElementById('success-state');
+    if (rc && !rc.classList.contains('hidden') && !window._metaPurchaseFired) {
+      window._metaPurchaseFired = true;
+      if (typeof fbq === 'function') {
+        fbq('track', 'Purchase', { value: 1800, currency: 'DZD' });
+      }
+    }
+  }, 500);
+</script> 
 
 </body>
 </html> 
