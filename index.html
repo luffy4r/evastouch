@@ -1867,12 +1867,13 @@ function showReceipt(m){
     (navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(()=>{b.textContent='Copié ✓';retrigger(b,'fx-pop');setTimeout(()=>{b.textContent=v},1500)}).catch(()=>{});
   };
   rc.classList.remove('hidden');
+    if(typeof fbq==='function')fbq('track','Purchase',{value:1800,currency:'DZD'});
 }
 let orderResp=null;
 const _fetch=window.fetch;
 window.fetch=function(u){
   const p=_fetch.apply(window,arguments);
-  if(String(u).includes('/order-telegram'))orderResp=p.then(r=>r.clone().json()).catch(()=>null);
+  if(String(u).includes('/order-telegram'))orderResp=p.then(r=>{if(typeof fbq==='function')fbq('track','Purchase',{value:1800,currency:'DZD'});return r.clone().json()}).catch(()=>null);
   return p;
 };
 function findTracking(o,d){
